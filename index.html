@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HumanitZ Wiki</title>
+  <meta name="description" content="Wiki do HumanitZ: todos os itens, raridade, onde encontrar, receitas e construções, extraídos dos arquivos do jogo.">
+  <link rel="icon" href="img/icons/Apple.webp">
+  <link rel="stylesheet" href="css/style.css?v=11">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#/">
+      <span class="brand-mark">Z</span>
+      <span class="brand-text">HumanitZ <em>Wiki</em></span>
+    </a>
+    <nav class="nav" id="nav">
+      <a href="#/" data-route="home">Início</a>
+      <a href="#/itens" data-route="itens">Itens</a>
+      <a href="#/raridade" data-route="raridade">Raridade</a>
+      <a href="#/locais" data-route="locais">Onde encontrar</a>
+      <a href="#/receitas" data-route="receitas">Receitas</a>
+      <a href="#/construcoes" data-route="construcoes">Construções</a>
+      <a href="#/municao" data-route="municao">Munição</a>
+      <a href="#/veiculos" data-route="veiculos">Veículos</a>
+      <a href="#/mapa" data-route="mapa">Mapa</a>
+    </nav>
+    <div class="top-tools">
+      <div class="global-search">
+        <input id="globalSearch" type="search" placeholder="Buscar item…" autocomplete="off" aria-label="Buscar item">
+        <div class="search-pop" id="searchPop" hidden></div>
+      </div>
+      <button class="lang-btn" id="langBtn" title="Alternar idioma dos nomes dos itens">PT</button>
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+    </div>
+  </header>
+
+  <main id="app" class="app" tabindex="-1"></main>
+
+  <footer class="footer">
+    <p>Wiki não oficial criada pela comunidade. Dados extraídos diretamente dos arquivos do jogo
+      (<code>DT_ItemDatabase</code>, tabelas de loot <code>INV_*</code>, <code>DT_CraftingData</code>, <code>DT_Buildings</code>).
+      HumanitZ é marca de seus respectivos donos.</p>
+  </footer>
+
+  <script src="js/data.js?v=4"></script>
+  <script src="js/vehicles.js?v=4"></script>
+  <script src="js/others.js?v=4"></script>
+  <script src="js/mapdata.js?v=12"></script>
+  <script src="js/lootmap.js?v=12"></script>
+  <script src="js/map.js?v=12"></script>
+  <script src="js/app.js?v=12"></script>
+</body>
+</html>
