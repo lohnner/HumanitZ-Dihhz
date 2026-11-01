@@ -115,6 +115,39 @@
       });
       focus = ['lootfocus'];
     }
+    // #/mapa?missao=ID: mostra quem entrega a missão, o objetivo e o local de entrega
+    const quest = query && query.missao && window.HZ_DATA.quests ? window.HZ_DATA.quests.find(q => q.id === query.missao) : null;
+    if (quest && quest.pins.length) {
+      const title = (quest.title && quest.title.pt) || quest.id;
+      catById.questfocus = { id: 'questfocus', name: 'Missão: ' + title, color: '#ffd84d', icon: '❗', group: '', n: quest.pins.length };
+      catColor.questfocus = '#ffd84d'; catName.questfocus = catById.questfocus.name;
+      const QPIN = { giver: 'Quem entrega', goal: 'Objetivo', turnin: 'Entrega da missão' };
+      const regs = M.pts.filter(p => p.c === 'regiao');
+      quest.pins.forEach(({ k, u, v, t }) => {
+        const near = regs.reduce((best, r) => (r.u - u) ** 2 + (r.v - v) ** 2 < (best.u - u) ** 2 + (best.v - v) ** 2 ? r : best, regs[0]);
+        ALL.push({ c: 'questfocus', u, v, t: t || QPIN[k], i: QPIN[k], a: near && near.t });
+      });
+      focus = ['questfocus'];
+    }
+    // #/mapa?grupo=horda:Zumbis: Corredores: mostra só os pontos com esse título dentro de uma categoria
+    const groupKey = query && query.grupo ? String(query.grupo) : '';
+    const groupCat = groupKey.slice(0, groupKey.indexOf(':')), groupTitle = groupKey.slice(groupKey.indexOf(':') + 1);
+    let groupRows = groupCat ? M.pts.filter(p => p.c === groupCat && p.t === groupTitle) : [];
+    let groupSource = groupCat, groupLabel = groupTitle;
+    // #/mapa?recruta=Ed,Magnus: pontos de recrutamento onde essa pessoa pode aparecer
+    if (query && query.recruta) {
+      const classes = String(query.recruta).split(',').filter(c => /^\w+$/.test(c));
+      const rx = classes.length ? new RegExp(`\\b(${classes.join('|')})\\b`) : null;
+      groupRows = rx ? M.pts.filter(p => p.c === 'sobrevivente' && rx.test(p.i || '')) : [];
+      groupSource = 'sobrevivente'; groupLabel = 'Onde pode aparecer: ' + classes[classes.length - 1];
+    }
+    if (groupRows.length) {
+      const icon = catById[groupSource].icon;
+      catById.groupfocus = { id: 'groupfocus', name: groupLabel, color: catColor[groupSource], icon, group: '', n: groupRows.length };
+      catColor.groupfocus = catColor[groupSource]; catName.groupfocus = groupLabel;
+      groupRows.forEach(p => ALL.push({ ...p, c: 'groupfocus' }));
+      focus = ['groupfocus'];
+    }
     const isFocus = id => focus.includes(id);
     let on = loadEnabled();
 
@@ -415,6 +448,8 @@
       if (!focus.length) { focusEl.hidden = true; focusList.hidden = true; return; }
       on = Object.fromEntries(M.cats.map(c => [c.id, isFocus(c.id) || c.id === 'regiao']));
       if (catById.lootfocus) on.lootfocus = true;
+      if (catById.questfocus) on.questfocus = true;
+      if (catById.groupfocus) on.groupfocus = true;
       syncBoxes();
       const pts = ALL.filter(p => isFocus(p.c));
       const names = focus.map(id => catById[id].name).join(' e ');
@@ -422,7 +457,7 @@
         <button id="mapFocusClear">✕ Ver todos os locais</button>`;
       focusEl.hidden = false;
       focusList.innerHTML = `<div class="map-group-title">Onde encontrar</div>` + pts.map(p => `<button data-i="${ALL.indexOf(p)}">${icoHtml(p.c)}
-        <span>${esc(p.t)}<small>${p.c === 'lootfocus' ? esc(p.i) + ' · ' : ''}${p.a ? 'perto de ' + esc(p.a) : ''}</small></span></button>`).join('');
+        <span>${esc(p.t)}<small>${p.c === 'lootfocus' || p.c === 'questfocus' ? esc(p.i) + ' · ' : ''}${p.a ? 'perto de ' + esc(p.a) : ''}</small></span></button>`).join('');
       focusList.hidden = false;
       document.getElementById('mapFocusClear').onclick = () => {
         focus = []; on = loadEnabled(); syncBoxes(); applyFocus(); select(null);

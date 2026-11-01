@@ -107,6 +107,8 @@ class Pkg:
                 return [self.struct(r, sname, None) for _ in range(n)]
             if it == 'ByteProperty' and n == size - 4:
                 return list(r.read(n))
+            if it == 'ByteProperty' and size is not None and n * 8 == size - 4:   # array de enum: nomes, não bytes
+                return [self.fname(r) for _ in range(n)]
             return [self.value(r, it, {}, None, True) for _ in range(n)]
         if typ == 'MapProperty':
             r.i32(); n = r.i32(); res = {}
@@ -126,7 +128,9 @@ class Pkg:
         if sname == 'Guid': return r.read(16).hex()
         if sname in ('DateTime', 'Timespan'): return struct.unpack('<q', r.read(8))[0]
         if sname == 'GameplayTagContainer': return [self.fname(r) for _ in range(r.i32())]
-        if sname == 'GameplayTag': return self.fname(r)
+        if sname == 'GameplayTag':
+            d = self.props(r)   # gravado como struct com a propriedade TagName
+            return d.get('TagName')
         if sname in ('SoftObjectPath', 'SoftClassPath'): p = self.fname(r); r.fstr(); return p
         if sname == '?': return self.props(r)   # valor de mapa: struct com propriedades marcadas
         return self.props(r)
